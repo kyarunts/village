@@ -26,7 +26,7 @@ router.post('/add_product', (req, res) => {
     var product = new Product(req.body);
     product.save((err, product) => {
         if (err) {
-            res.status(500).send(err);
+            res.send(err);
         }
         else {
             res.status(201).json(product);
@@ -38,7 +38,7 @@ router.post('/add_category', (req, res) => {
     var category = new Category(req.body);
     category.save((err, category) => {
         if (err) {
-            res.status(500).send(err);
+            res.send(err);
         }
         else {
             res.status(201).json(category);
@@ -50,7 +50,7 @@ router.post('/add_unit_type', (req, res) => {
     var unitType = new UnitType(req.body);
     unitType.save((err, unitType) => {
         if (err) {
-            res.status(500).send(err);
+            res.send(err);
         }
         else {
             res.status(201).json(unitType);
@@ -62,7 +62,7 @@ router.post('/place_order', (req, res) => {
     var order = new Order(req.body);
     order.save((err, order) => {
         if (err) {
-            res.status(500).send(err);
+            res.send(err);
         }
         else {
             res.status(201).json(order);
@@ -85,7 +85,7 @@ router.put('/confirm_order/', (req, res) => {
                 order.confirmedDate = Date.now();
                 order.save((err, updatedOrder) => {
                     if (err) {
-                        res.status(500).send(err);
+                        res.send(err);
                     }
                     res.status(200).json(updatedOrder);
                 })
@@ -112,7 +112,7 @@ router.put('/confirm_delivery', (req, res) => {
                 order.deliveredDate = Date.now();
                 order.save((err, updatedOrder) => {
                     if (err) {
-                        res.status(500).send(err);
+                        res.send(err);
                     }
                     res.status(200).json(updatedOrder);
                 })
@@ -139,7 +139,7 @@ router.put('/cancel_order', (req, res) => {
                 order.canceledDate = Date.now();
                 order.save((err, updatedOrder) => {
                     if (err) {
-                        res.status(500).send(err);
+                        res.send(err);
                     }
                     res.status(200).json(updatedOrder);
                 })
@@ -150,15 +150,67 @@ router.put('/cancel_order', (req, res) => {
 
 router.delete('/delete_product', (req, res) => {
     let id = req.body.id;
-    Product.findById(id, (err, product) => {
+    Product.findByIdAndRemove(id, (err, product) => {
         if (err) {
-            res.status(404).send(err).end();
+            res.send(err);
         }
         else {
-            product.deleteOne(product);
+            if (product) {
+                let response = {
+                    'message': 'Product deleted successfully',
+                    'id': product._id
+                }
+                res.status(200).json(response);
+            }
+            else {
+                res.status(404).send();
+            }
+        }
+    });
+});
+
+router.delete('/delete_category', (req, res) => {
+    let id = req.body.id;
+    Category.findByIdAndRemove(id, (err, category) => {
+        if (err) {
+            res.send(err);
+        }
+        else {
+            if (category) {
+                let response = {
+                    'message': 'Category deleted successfully',
+                    'id': category._id
+                }
+                res.status(200).json(response);
+            }
+            else {
+                res.status(404).send();
+            }
         }
     })
 });
+
+router.delete('/delete_unit_type', (req, res) => {
+    let id = req.body.id;
+    UnitType.findByIdAndRemove(id, (err, unitType) => {
+        if (err) {
+            res.status(400).send(err);
+        }
+        else {
+            if (unitType) {
+                let response = {
+                    'message': 'Unit Type deleted successfully',
+                    'id': unitType._id
+                }
+                res.status(200).json(response);
+            }
+            else {
+                res.status(404).send();
+            }
+        }
+    })
+});
+
 
 app.use('/api', router);
 

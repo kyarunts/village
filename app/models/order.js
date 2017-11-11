@@ -9,7 +9,7 @@ var OrderSchema = new Schema({
     deliveredDate: Date,
     address: String,
     notes: String | null,
-    items: [{"id":String,"quantity":Number}],
+    items: [{ "id": String, "quantity": Number}],
     status: {type: String, default: 'new'}
 });
 

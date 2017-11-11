@@ -3,6 +3,14 @@ var app          = express();
 var bodyParser   = require('body-parser');
 var mongoose     = require('mongoose');
 var morgan       = require('morgan');
+
+var userHandlers = require('./app/controllers/user');
+var productHandlers = require('./app/controllers/product');
+var categoryHandlers = require('./app/controllers/category');
+var unitTypeHandlers = require('./app/controllers/unitType');
+var orderHandlers = require('./app/controllers/order');
+
+var jsonwebtoken = require('jsonwebtoken');
 mongoose.Promise = require('bluebird');
 mongoose.connect('mongodb://kyarunts:kyarunts@ds151355.mlab.com:51355/village', {useMongoClient: true});
 
@@ -18,21 +26,88 @@ var port = process.env.PORT || 8080;
 
 var router = express.Router();
 
+app.use((req, res, next) => {
+    if (
+        req.headers && 
+        req.headers.authorization && 
+        req.headers.authorization.split(' ')[0] === 'JWT'
+    ) {
+        jsonwebtoken.verify(
+            req.headers.authorization.split(' ')[1],
+            'RESTFULAPIs',
+            (err, decode) => {
+                if (err) {
+                    req.user = undefined;
+                }
+                else {
+                    req.user = decode;
+                    next();
+                }
+            }
+        );
+    }
+    else {
+        req.user = undefined;
+        next();
+    }
+});
+
 router.get('/', function (req, res) {
     res.json({ message: 'hooray! welcome to our api!' });
 });
 
-router.post('/add_product', (req, res) => {
-    var product = new Product(req.body);
-    product.save((err, product) => {
-        if (err) {
-            res.send(err);
-        }
-        else {
-            res.status(201).json(product);
-        }
-    })
-});
+router.post('/register', userHandlers.register);
+
+router.post('/sign_in', userHandlers.sign_in);
+
+router.route('/product')
+    .get(productHandlers.getByQuery)
+    .post(userHandlers.loginRequired, productHandlers.create)
+
+router.route('/product/:id')
+    .get(productHandlers.getOne)
+    .put(productHandlers.update)
+    .delete(userHandlers.loginRequired, productHandlers.delete)
+
+router.route('/category')
+    .get(categoryHandlers.getByQuery)
+    .post(userHandlers.loginRequired, categoryHandlers.create)
+
+router.route('/category/:id')
+    .get(categoryHandlers.getOne)
+    .put(userHandlers.loginRequired, categoryHandlers.update)
+    .delete(userHandlers.loginRequired, categoryHandlers.delete)
+
+router.route('/unit_type')
+    .get(unitTypeHandlers.getByQuery)
+    .post(userHandlers.loginRequired, unitTypeHandlers.create)
+
+router.route('/unit_type/:id')
+    .get(unitTypeHandlers.getOne)
+    .put(userHandlers.loginRequired, unitTypeHandlers.update)
+    .delete(userHandlers.loginRequired, unitTypeHandlers.delete)
+
+router.route('/order')
+    .get(userHandlers.loginRequired, orderHandlers.getByQuery)
+    .post(orderHandlers.create)
+
+router.route('/order/:id')
+    .get(userHandlers.loginRequired, orderHandlers.getOne)
+    .put(userHandlers.loginRequired, orderHandlers.update)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post('/add_category', (req, res) => {
     var category = new Category(req.body);

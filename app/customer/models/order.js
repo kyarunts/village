@@ -7,9 +7,14 @@ var OrderSchema = new Schema({
     confirmedDate: Date,
     canceledDate: Date,
     deliveredDate: Date,
+    userID: { type: Schema.Types.ObjectId, ref: 'User' },
     address: String,
     notes: String | null,
-    items: [{ "id": String, "quantity": Number}],
+    items: [{
+        productID: { type: Schema.Types.ObjectId, ref: 'Product' },
+        quantity: Number,
+        partnerID: { type: Schema.Types.ObjectId, ref: 'Partner' }
+    }],
     status: {type: String, default: 'new'}
 });
 

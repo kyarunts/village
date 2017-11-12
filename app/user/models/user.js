@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
-var bcrypt   = require('bcrypt');
+var Schema = mongoose.Schema;
+var bcrypt = require('bcrypt');
 var uniqueValidator = require('mongoose-unique-validator');
 
 var UserSchema = new Schema({
@@ -20,6 +20,10 @@ var UserSchema = new Schema({
     created: {
         type: Date,
         default: Date.now
+    },
+    role: {
+        type: String,
+        default: 'user'
     }
 });
 

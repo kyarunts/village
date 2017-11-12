@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+var Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
 
 var ProductSchema = new Schema({
@@ -7,10 +7,12 @@ var ProductSchema = new Schema({
     name_ru: String,
     name_eng: String,
     price: Number,
-    categoryId: Number,
-    quantity: Number,
-    unitTypeId: Number,
-    description: Number
+    category: { type: Schema.Types.ObjectId, ref: 'Category' },
+    unitType: { type: Schema.Types.ObjectId, ref: 'UnitType'},
+    description: Number,
+    photos: [String],
+    coverPhoto: String,
+    icon: String
 });
 ProductSchema.plugin(uniqueValidator);
 

@@ -3,7 +3,10 @@ var app = express();
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var jsonwebtoken = require('jsonwebtoken');
-var apiRoutes = require('./app/routes');
+
+var adminRoutes = require('./app/admin/adminRoutes');
+var userRoutes = require('./app/user/userRoutes');
+var customerRoutes = require('./app/customer/customerRoutes');
 
 var port = process.env.PORT || 8080;
 
@@ -27,6 +30,7 @@ app.use((req, res, next) => {
                     req.user = undefined;
                 }
                 else {
+                    console.log(decode)
                     req.user = decode;
                     next();
                 }
@@ -39,5 +43,8 @@ app.use((req, res, next) => {
     }
 });
 
-app.use('/api', apiRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/customer', customerRoutes);
+
 app.listen(port);
